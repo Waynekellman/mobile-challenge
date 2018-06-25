@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,10 +18,13 @@ public class MainActivity extends AppCompatActivity {
 
   private View homeView;
   private View favoritesView;
+  private ActionBar actionBar;
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    actionBar = getSupportActionBar();
 
     LayoutInflater layoutInflater = getLayoutInflater();
 
@@ -30,8 +34,9 @@ public class MainActivity extends AppCompatActivity {
     container = findViewById(R.id.container);
     bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-    // set the initial view
+    // set the initial view and action bar text
     container.addView(homeView);
+    actionBar.setTitle(R.string.home_title);
 
     // logic to switch views upon tab click
     bottomNavigationView.setOnNavigationItemSelectedListener(
@@ -42,10 +47,12 @@ public class MainActivity extends AppCompatActivity {
               case R.id.action_home:
                 container.removeAllViews();
                 container.addView(homeView);
+                actionBar.setTitle(R.string.home_title);
                 break;
               case R.id.action_favorites:
                 container.removeAllViews();
                 container.addView(favoritesView);
+                actionBar.setTitle(R.string.favorites_title);
                 break;
               default:
                 throw new IllegalStateException(
