@@ -1,0 +1,14 @@
+apply plugin: 'com.android.application'
+
+android {
+  compileSdkVersion 27
+  defaultConfig {
+    applicationId "nyc.c4q.vice.mobile"
+    minSdkVersion 25
+    targetSdkVersion 27
+  }
+}
+
+dependencies {
+  implementation 'com.android.support:appcompat-v7:27.1.1'
+}
