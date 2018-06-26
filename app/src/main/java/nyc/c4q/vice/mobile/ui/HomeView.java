@@ -13,25 +13,25 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
+import javax.inject.Inject;
 import nyc.c4q.vice.mobile.BuildConfig;
 import nyc.c4q.vice.mobile.R;
+import nyc.c4q.vice.mobile.ViceApp;
 import nyc.c4q.vice.mobile.api.MovieService;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeView extends LinearLayout {
   @BindView(R.id.now_playing) RecyclerView nowPlayingRecyclerView;
   @BindView(R.id.most_popular) RecyclerView mostPopularRecyclerView;
 
+  @Inject MovieService movieService;
+
   private MovieAdapter nowPlayingAdapter;
   private MovieAdapter mostPopularAdapter;
-  private MovieService movieService;
   private CompositeDisposable disposables = new CompositeDisposable();
 
   public HomeView(@NonNull Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
+    ((ViceApp) context.getApplicationContext()).component().inject(this);
   }
 
   @Override protected void onFinishInflate() {
@@ -51,13 +51,6 @@ public class HomeView extends LinearLayout {
 
   @Override protected void onAttachedToWindow() {
     super.onAttachedToWindow();
-
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl("https://api.themoviedb.org/3/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-        .build();
-    movieService = retrofit.create(MovieService.class);
 
     disposables.add(
         movieService.getNowPlayingMovies(BuildConfig.MOVIE_DATABASE_API_KEY)

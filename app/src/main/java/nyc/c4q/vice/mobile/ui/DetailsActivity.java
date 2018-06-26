@@ -14,16 +14,14 @@ import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
+import javax.inject.Inject;
 import nyc.c4q.vice.mobile.BuildConfig;
 import nyc.c4q.vice.mobile.R;
+import nyc.c4q.vice.mobile.ViceApp;
 import nyc.c4q.vice.mobile.api.MovieService;
 import nyc.c4q.vice.mobile.db.FavoritesDatabaseHelper;
 import nyc.c4q.vice.mobile.model.Movie;
 import nyc.c4q.vice.mobile.model.Review;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DetailsActivity extends AppCompatActivity {
   private static final String MOVIE_BACKDROP_URL_PREFIX = "https://image.tmdb.org/t/p/w1280/";
@@ -36,14 +34,16 @@ public class DetailsActivity extends AppCompatActivity {
   @BindView(R.id.reviews) ViewGroup reviews;
   @BindView(R.id.fab) FloatingActionButton fab;
 
+  @Inject MovieService movieService;
+
   private FavoritesDatabaseHelper databaseHelper;
-  private MovieService movieService;
   private CompositeDisposable disposables = new CompositeDisposable();
 
   @Override protected void onCreate(@Nullable Bundle bundle) {
     super.onCreate(bundle);
     setContentView(R.layout.activity_details);
     ButterKnife.bind(this);
+    ((ViceApp) getApplication()).component().inject(this);
 
     databaseHelper = FavoritesDatabaseHelper.getInstance(this);
 
@@ -65,13 +65,6 @@ public class DetailsActivity extends AppCompatActivity {
         fab.setImageResource(R.drawable.ic_done);
       }
     });
-
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl("https://api.themoviedb.org/3/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-        .build();
-    movieService = retrofit.create(MovieService.class);
   }
 
   @Override protected void onResume() {
