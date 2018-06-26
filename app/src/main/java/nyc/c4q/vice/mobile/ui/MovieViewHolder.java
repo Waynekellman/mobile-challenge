@@ -9,7 +9,9 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
+import javax.inject.Inject;
 import nyc.c4q.vice.mobile.R;
+import nyc.c4q.vice.mobile.ViceApp;
 import nyc.c4q.vice.mobile.model.Movie;
 
 public class MovieViewHolder extends RecyclerView.ViewHolder {
@@ -18,14 +20,17 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
   @BindView(R.id.movie_image) ImageView image;
   @BindView(R.id.movie_title) TextView title;
 
+  @Inject Picasso picasso;
+
   public MovieViewHolder(View view) {
     super(view);
+    ((ViceApp) view.getContext().getApplicationContext()).component().inject(this);
     ButterKnife.bind(this, view);
   }
 
   public void bind(final Movie movie) {
     String moviePosterUrl = MOVIE_IMAGE_URL_PREFIX + movie.poster_path;
-    Picasso.get().load(moviePosterUrl).into(image);
+    picasso.load(moviePosterUrl).into(image);
     title.setText(movie.title);
 
     itemView.setOnClickListener(v -> {

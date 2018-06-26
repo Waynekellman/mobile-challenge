@@ -36,6 +36,7 @@ public class DetailsActivity extends AppCompatActivity {
 
   @Inject MovieService movieService;
   @Inject FavoritesDatabaseHelper databaseHelper;
+  @Inject Picasso picasso;
 
   private CompositeDisposable disposables = new CompositeDisposable();
 
@@ -77,7 +78,7 @@ public class DetailsActivity extends AppCompatActivity {
             .subscribe(
                 details -> {
                   String backdropPath = MOVIE_BACKDROP_URL_PREFIX + details.backdrop_path;
-                  Picasso.get().load(backdropPath).into(imageView);
+                  picasso.load(backdropPath).into(imageView);
                   titleView.setText(details.title);
                   releaseDateView.setText(details.release_date);
                   ratingView.setText(String.valueOf(details.vote_average));
