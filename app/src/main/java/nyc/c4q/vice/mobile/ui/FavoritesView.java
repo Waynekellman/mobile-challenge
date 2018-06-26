@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import java.util.List;
 import nyc.c4q.vice.mobile.R;
 import nyc.c4q.vice.mobile.db.FavoritesDatabaseHelper;
@@ -16,8 +18,8 @@ import nyc.c4q.vice.mobile.model.Movie;
 import static android.support.v7.widget.LinearLayoutManager.HORIZONTAL;
 
 public class FavoritesView extends FrameLayout {
-  private RecyclerView favoritesRecyclerView;
-  private TextView emptyView;
+  @BindView(R.id.favorites) RecyclerView favoritesRecyclerView;
+  @BindView(R.id.empty) TextView emptyView;
 
   private MovieAdapter favoritesAdapter;
 
@@ -27,9 +29,7 @@ public class FavoritesView extends FrameLayout {
 
   @Override protected void onFinishInflate() {
     super.onFinishInflate();
-
-    favoritesRecyclerView = findViewById(R.id.favorites);
-    emptyView = findViewById(R.id.empty);
+    ButterKnife.bind(this);
 
     favoritesRecyclerView.setLayoutManager(
         new LinearLayoutManager(getContext(), HORIZONTAL, false));

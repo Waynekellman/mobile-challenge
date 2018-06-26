@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import nyc.c4q.vice.mobile.BuildConfig;
 import nyc.c4q.vice.mobile.R;
 import nyc.c4q.vice.mobile.api.MovieService;
@@ -20,8 +22,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeView extends LinearLayout {
-  private RecyclerView nowPlayingRecyclerView;
-  private RecyclerView mostPopularRecyclerView;
+  @BindView(R.id.now_playing) RecyclerView nowPlayingRecyclerView;
+  @BindView(R.id.most_popular) RecyclerView mostPopularRecyclerView;
 
   private MovieAdapter nowPlayingAdapter;
   private MovieAdapter mostPopularAdapter;
@@ -33,9 +35,7 @@ public class HomeView extends LinearLayout {
 
   @Override protected void onFinishInflate() {
     super.onFinishInflate();
-
-    nowPlayingRecyclerView = findViewById(R.id.now_playing);
-    mostPopularRecyclerView = findViewById(R.id.most_popular);
+    ButterKnife.bind(this);
 
     nowPlayingRecyclerView.setLayoutManager(
         new LinearLayoutManager(getContext(), HORIZONTAL, false));

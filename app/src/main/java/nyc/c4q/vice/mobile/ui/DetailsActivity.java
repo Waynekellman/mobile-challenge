@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
 import nyc.c4q.vice.mobile.BuildConfig;
 import nyc.c4q.vice.mobile.R;
@@ -28,13 +30,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DetailsActivity extends AppCompatActivity {
   private static final String MOVIE_BACKDROP_URL_PREFIX = "https://image.tmdb.org/t/p/w1280/";
 
-  private ImageView imageView;
-  private TextView titleView;
-  private TextView releaseDateView;
-  private TextView ratingView;
-  private TextView overviewView;
-  private ViewGroup reviews;
-  private FloatingActionButton fab;
+  @BindView(R.id.image) ImageView imageView;
+  @BindView(R.id.title) TextView titleView;
+  @BindView(R.id.release_date) TextView releaseDateView;
+  @BindView(R.id.rating) TextView ratingView;
+  @BindView(R.id.overview) TextView overviewView;
+  @BindView(R.id.reviews) ViewGroup reviews;
+  @BindView(R.id.fab) FloatingActionButton fab;
 
   private FavoritesDatabaseHelper databaseHelper;
   private MovieService movieService;
@@ -42,14 +44,7 @@ public class DetailsActivity extends AppCompatActivity {
   @Override protected void onCreate(@Nullable Bundle bundle) {
     super.onCreate(bundle);
     setContentView(R.layout.activity_details);
-
-    imageView = findViewById(R.id.image);
-    titleView = findViewById(R.id.title);
-    releaseDateView = findViewById(R.id.release_date);
-    ratingView = findViewById(R.id.rating);
-    overviewView = findViewById(R.id.overview);
-    reviews = findViewById(R.id.reviews);
-    fab = findViewById(R.id.fab);
+    ButterKnife.bind(this);
 
     databaseHelper = FavoritesDatabaseHelper.getInstance(this);
 
