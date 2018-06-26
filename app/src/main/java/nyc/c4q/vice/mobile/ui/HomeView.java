@@ -8,6 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import nyc.c4q.vice.mobile.R;
+import nyc.c4q.vice.mobile.api.MovieService;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeView extends LinearLayout {
   private RecyclerView nowPlayingRecyclerView;
@@ -15,6 +18,7 @@ public class HomeView extends LinearLayout {
 
   private MovieAdapter nowPlayingAdapter;
   private MovieAdapter mostPopularAdapter;
+  private MovieService movieService;
 
   public HomeView(@NonNull Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
@@ -35,5 +39,15 @@ public class HomeView extends LinearLayout {
         new LinearLayoutManager(getContext(), HORIZONTAL, false));
     mostPopularAdapter = new MovieAdapter();
     mostPopularRecyclerView.setAdapter(mostPopularAdapter);
+  }
+
+  @Override protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+
+    Retrofit retrofit = new Retrofit.Builder()
+        .baseUrl("https://api.themoviedb.org/3/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build();
+    movieService = retrofit.create(MovieService.class);
   }
 }
