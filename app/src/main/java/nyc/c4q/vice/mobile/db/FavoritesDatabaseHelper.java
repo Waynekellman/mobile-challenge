@@ -60,6 +60,16 @@ public class FavoritesDatabaseHelper extends SQLiteOpenHelper {
     }
   }
 
+  public void deleteFavorite(int movieId) {
+    SQLiteDatabase db = getWritableDatabase();
+
+    try {
+      db.delete(TABLE_FAVORITES, "movieId = ?", new String[] { String.valueOf(movieId) });
+    } catch (Exception e) {
+      Log.e("C4Q", "Error while trying to delete all posts and users", e);
+    }
+  }
+
   public boolean isFavorite(int movieId) {
     SQLiteDatabase db = getReadableDatabase();
     Cursor cursor =
