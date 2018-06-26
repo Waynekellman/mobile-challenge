@@ -9,7 +9,9 @@ public class ViceApp extends Application {
   @Override public void onCreate() {
     super.onCreate();
 
-    appComponent = DaggerViceAppComponent.create();
+    appComponent = DaggerViceAppComponent.builder()
+        .androidModule(new AndroidModule(this))
+        .build();
   }
 
   public ViceAppComponent component() {

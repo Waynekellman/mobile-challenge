@@ -35,8 +35,8 @@ public class DetailsActivity extends AppCompatActivity {
   @BindView(R.id.fab) FloatingActionButton fab;
 
   @Inject MovieService movieService;
+  @Inject FavoritesDatabaseHelper databaseHelper;
 
-  private FavoritesDatabaseHelper databaseHelper;
   private CompositeDisposable disposables = new CompositeDisposable();
 
   @Override protected void onCreate(@Nullable Bundle bundle) {
@@ -44,8 +44,6 @@ public class DetailsActivity extends AppCompatActivity {
     setContentView(R.layout.activity_details);
     ButterKnife.bind(this);
     ((ViceApp) getApplication()).component().inject(this);
-
-    databaseHelper = FavoritesDatabaseHelper.getInstance(this);
 
     Intent intent = getIntent();
     final int movieId = intent.getIntExtra("movie_id", 0);
