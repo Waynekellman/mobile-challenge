@@ -15,17 +15,8 @@ public class FavoritesDatabaseHelper extends SQLiteOpenHelper {
   private static final int DATABASE_VERSION = 1;
   private static final String TABLE_FAVORITES = "favorites";
 
-  private static FavoritesDatabaseHelper sInstance;
-
   public FavoritesDatabaseHelper(Context context) {
     super(context, DATABASE_NAME, null, DATABASE_VERSION);
-  }
-
-  public static synchronized FavoritesDatabaseHelper getInstance(Context context) {
-    if (sInstance == null) {
-      sInstance = new FavoritesDatabaseHelper(context.getApplicationContext());
-    }
-    return sInstance;
   }
 
   @Override public void onCreate(SQLiteDatabase db) {
