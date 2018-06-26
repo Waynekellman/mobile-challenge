@@ -70,6 +70,13 @@ public class DetailsActivity extends AppCompatActivity {
         .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
         .build();
     movieService = retrofit.create(MovieService.class);
+  }
+
+  @Override protected void onResume() {
+    super.onResume();
+
+    Intent intent = getIntent();
+    int movieId = intent.getIntExtra("movie_id", 0);
 
     movieService.getMovieDetails(movieId, BuildConfig.MOVIE_DATABASE_API_KEY)
         .observeOn(AndroidSchedulers.mainThread())
