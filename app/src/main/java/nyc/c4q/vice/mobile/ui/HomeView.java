@@ -12,6 +12,7 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import nyc.c4q.vice.mobile.BuildConfig;
 import nyc.c4q.vice.mobile.R;
@@ -27,6 +28,7 @@ public class HomeView extends LinearLayout {
   private MovieAdapter nowPlayingAdapter;
   private MovieAdapter mostPopularAdapter;
   private MovieService movieService;
+  private CompositeDisposable disposables = new CompositeDisposable();
 
   public HomeView(@NonNull Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
@@ -57,26 +59,35 @@ public class HomeView extends LinearLayout {
         .build();
     movieService = retrofit.create(MovieService.class);
 
-    movieService.getNowPlayingMovies(BuildConfig.MOVIE_DATABASE_API_KEY)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(
-            movieResponse -> {
-              nowPlayingAdapter.setData(movieResponse.results);
-            },
-            t -> {
-              Log.e("C4Q", "Error obtaining movies", t);
-              Toast.makeText(getContext(), "Error obtaining movies", Toast.LENGTH_SHORT).show();
-            });
+    disposables.add(
+        movieService.getNowPlayingMovies(BuildConfig.MOVIE_DATABASE_API_KEY)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                movieResponse -> {
+                  nowPlayingAdapter.setData(movieResponse.results);
+                },
+                t -> {
+                  Log.e("C4Q", "Error obtaining movies", t);
+                  Toast.makeText(getContext(), "Error obtaining movies", Toast.LENGTH_SHORT).show();
+                })
+    );
 
-    movieService.getPopularMovies(BuildConfig.MOVIE_DATABASE_API_KEY)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(
-            movieResponse -> {
-              mostPopularAdapter.setData(movieResponse.results);
-            },
-            t -> {
-              Log.e("C4Q", "Error obtaining movies", t);
-              Toast.makeText(getContext(), "Error obtaining movies", Toast.LENGTH_SHORT).show();
-            });
+    disposables.add(
+        movieService.getPopularMovies(BuildConfig.MOVIE_DATABASE_API_KEY)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                movieResponse -> {
+                  mostPopularAdapter.setData(movieResponse.results);
+                },
+                t -> {
+                  Log.e("C4Q", "Error obtaining movies", t);
+                  Toast.makeText(getContext(), "Error obtaining movies", Toast.LENGTH_SHORT).show();
+                })
+    );
+  }
+
+  @Override protected void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+    disposables.dispose();
   }
 }

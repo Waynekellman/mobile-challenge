@@ -13,6 +13,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import nyc.c4q.vice.mobile.BuildConfig;
 import nyc.c4q.vice.mobile.R;
@@ -37,6 +38,7 @@ public class DetailsActivity extends AppCompatActivity {
 
   private FavoritesDatabaseHelper databaseHelper;
   private MovieService movieService;
+  private CompositeDisposable disposables = new CompositeDisposable();
 
   @Override protected void onCreate(@Nullable Bundle bundle) {
     super.onCreate(bundle);
@@ -78,31 +80,40 @@ public class DetailsActivity extends AppCompatActivity {
     Intent intent = getIntent();
     int movieId = intent.getIntExtra("movie_id", 0);
 
-    movieService.getMovieDetails(movieId, BuildConfig.MOVIE_DATABASE_API_KEY)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(
-            details -> {
-              String backdropPath = MOVIE_BACKDROP_URL_PREFIX + details.backdrop_path;
-              Picasso.get().load(backdropPath).into(imageView);
-              titleView.setText(details.title);
-              releaseDateView.setText(details.release_date);
-              ratingView.setText(String.valueOf(details.vote_average));
-              overviewView.setText(details.overview);
-            },
-            t -> Log.e("C4Q", "Error obtaining movie details", t)
-        );
+    disposables.add(
+        movieService.getMovieDetails(movieId, BuildConfig.MOVIE_DATABASE_API_KEY)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                details -> {
+                  String backdropPath = MOVIE_BACKDROP_URL_PREFIX + details.backdrop_path;
+                  Picasso.get().load(backdropPath).into(imageView);
+                  titleView.setText(details.title);
+                  releaseDateView.setText(details.release_date);
+                  ratingView.setText(String.valueOf(details.vote_average));
+                  overviewView.setText(details.overview);
+                },
+                t -> Log.e("C4Q", "Error obtaining movie details", t)
+            )
+    );
 
-    movieService.getReviews(movieId, BuildConfig.MOVIE_DATABASE_API_KEY)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(
-            reviewResponse -> {
-              for (Review review : reviewResponse.results) {
-                TextView reviewView = new TextView(this);
-                reviewView.setText(review.content);
-                reviews.addView(reviewView);
-              }
-            },
-            t -> Log.e("C4Q", "Error obtaining movie reviews", t)
-        );
+    disposables.add(
+        movieService.getReviews(movieId, BuildConfig.MOVIE_DATABASE_API_KEY)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                reviewResponse -> {
+                  for (Review review : reviewResponse.results) {
+                    TextView reviewView = new TextView(this);
+                    reviewView.setText(review.content);
+                    reviews.addView(reviewView);
+                  }
+                },
+                t -> Log.e("C4Q", "Error obtaining movie reviews", t)
+            )
+    );
+  }
+
+  @Override protected void onPause() {
+    super.onPause();
+    disposables.dispose();
   }
 }
