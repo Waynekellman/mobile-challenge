@@ -12,18 +12,16 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import nyc.c4q.vice.mobile.BuildConfig;
 import nyc.c4q.vice.mobile.R;
 import nyc.c4q.vice.mobile.api.MovieService;
 import nyc.c4q.vice.mobile.db.FavoritesDatabaseHelper;
 import nyc.c4q.vice.mobile.model.Movie;
-import nyc.c4q.vice.mobile.model.MovieDetails;
 import nyc.c4q.vice.mobile.model.Review;
-import nyc.c4q.vice.mobile.model.ReviewResponse;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DetailsActivity extends AppCompatActivity {
@@ -69,52 +67,35 @@ public class DetailsActivity extends AppCompatActivity {
     Retrofit retrofit = new Retrofit.Builder()
         .baseUrl("https://api.themoviedb.org/3/")
         .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
         .build();
     movieService = retrofit.create(MovieService.class);
 
-    Call<MovieDetails> movieDetails =
-        movieService.getMovieDetails(movieId, BuildConfig.MOVIE_DATABASE_API_KEY);
-    movieDetails.enqueue(new Callback<MovieDetails>() {
-      @Override public void onResponse(Call<MovieDetails> call, Response<MovieDetails> response) {
-        if (response.isSuccessful()) {
-          MovieDetails details = response.body();
+    movieService.getMovieDetails(movieId, BuildConfig.MOVIE_DATABASE_API_KEY)
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            details -> {
+              String backdropPath = MOVIE_BACKDROP_URL_PREFIX + details.backdrop_path;
+              Picasso.get().load(backdropPath).into(imageView);
+              titleView.setText(details.title);
+              releaseDateView.setText(details.release_date);
+              ratingView.setText(String.valueOf(details.vote_average));
+              overviewView.setText(details.overview);
+            },
+            t -> Log.e("C4Q", "Error obtaining movie details", t)
+        );
 
-          String backdropPath = MOVIE_BACKDROP_URL_PREFIX + details.backdrop_path;
-          Picasso.get().load(backdropPath).into(imageView);
-          titleView.setText(details.title);
-          releaseDateView.setText(details.release_date);
-          ratingView.setText(String.valueOf(details.vote_average));
-          overviewView.setText(details.overview);
-
-          loadExtraDetails(movieId);
-        }
-      }
-
-      @Override public void onFailure(Call<MovieDetails> call, Throwable t) {
-        Log.e("C4Q", "Error obtaining movie details", t);
-      }
-    });
-  }
-
-  private void loadExtraDetails(int movieId) {
-    Call<ReviewResponse> reviewsCall =
-        movieService.getReviews(movieId, BuildConfig.MOVIE_DATABASE_API_KEY);
-    reviewsCall.enqueue(new Callback<ReviewResponse>() {
-      @Override
-      public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
-        if (response.isSuccessful()) {
-          ReviewResponse reviewResponse = response.body();
-          for (Review review : reviewResponse.results) {
-            TextView reviewView = new TextView(DetailsActivity.this);
-            reviewView.setText(review.content);
-            reviews.addView(reviewView);
-          }
-        }
-      }
-
-      @Override public void onFailure(Call<ReviewResponse> call, Throwable t) {
-        Log.e("C4Q", "Error obtaining movie reviews", t);
-      }
-    });
+    movieService.getReviews(movieId, BuildConfig.MOVIE_DATABASE_API_KEY)
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            reviewResponse -> {
+              for (Review review : reviewResponse.results) {
+                TextView reviewView = new TextView(this);
+                reviewView.setText(review.content);
+                reviews.addView(reviewView);
+              }
+            },
+            t -> Log.e("C4Q", "Error obtaining movie reviews", t)
+        );
   }
 }
