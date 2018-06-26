@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 import nyc.c4q.vice.mobile.model.Movie;
 
 public class FavoritesDatabaseHelper extends SQLiteOpenHelper {
@@ -80,5 +82,29 @@ public class FavoritesDatabaseHelper extends SQLiteOpenHelper {
     }
 
     return count != 0;
+  }
+
+  public List<Movie> getFavorites() {
+    List<Movie> favorites = new ArrayList<>();
+
+    SQLiteDatabase db = getReadableDatabase();
+    Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_FAVORITES, null);
+    try {
+      if (cursor.moveToFirst()) {
+        do {
+          int movieId = cursor.getInt(cursor.getColumnIndex("movieId"));
+          String posterPath = cursor.getString(cursor.getColumnIndex("posterPath"));
+          String title = cursor.getString(cursor.getColumnIndex("title"));
+          favorites.add(Movie.from(movieId, posterPath, title));
+        } while (cursor.moveToNext());
+      }
+    } catch (Exception e) {
+      Log.e("C4Q", "Error while trying to get favorites from database", e);
+    } finally {
+      if (cursor != null && !cursor.isClosed()) {
+        cursor.close();
+      }
+    }
+    return favorites;
   }
 }
