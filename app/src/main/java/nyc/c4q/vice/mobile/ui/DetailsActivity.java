@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,6 +14,8 @@ import com.squareup.picasso.Picasso;
 import nyc.c4q.vice.mobile.BuildConfig;
 import nyc.c4q.vice.mobile.R;
 import nyc.c4q.vice.mobile.api.MovieService;
+import nyc.c4q.vice.mobile.db.FavoritesDatabaseHelper;
+import nyc.c4q.vice.mobile.model.Movie;
 import nyc.c4q.vice.mobile.model.MovieDetails;
 import nyc.c4q.vice.mobile.model.Review;
 import nyc.c4q.vice.mobile.model.ReviewResponse;
@@ -33,6 +36,7 @@ public class DetailsActivity extends AppCompatActivity {
   private ViewGroup reviews;
   private FloatingActionButton fab;
 
+  private FavoritesDatabaseHelper databaseHelper;
   private MovieService movieService;
 
   @Override protected void onCreate(@Nullable Bundle bundle) {
@@ -47,8 +51,25 @@ public class DetailsActivity extends AppCompatActivity {
     reviews = findViewById(R.id.reviews);
     fab = findViewById(R.id.fab);
 
+    databaseHelper = FavoritesDatabaseHelper.getInstance(this);
+
     Intent intent = getIntent();
     final int movieId = intent.getIntExtra("movie_id", 0);
+    final String posterPath = intent.getStringExtra("poster_path");
+    final String title = intent.getStringExtra("title");
+
+    boolean isFavorite = databaseHelper.isFavorite(movieId);
+    fab.setImageResource(isFavorite ? R.drawable.ic_done : R.drawable.ic_save);
+
+    fab.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        boolean isFavorite = databaseHelper.isFavorite(movieId);
+        if (!isFavorite) {
+          databaseHelper.addFavorite(Movie.from(movieId, posterPath, title));
+          fab.setImageResource(R.drawable.ic_done);
+        }
+      }
+    });
 
     Retrofit retrofit = new Retrofit.Builder()
         .baseUrl("https://api.themoviedb.org/3/")
