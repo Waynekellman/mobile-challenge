@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -56,16 +55,14 @@ public class DetailsActivity extends AppCompatActivity {
     boolean isFavorite = databaseHelper.isFavorite(movieId);
     fab.setImageResource(isFavorite ? R.drawable.ic_done : R.drawable.ic_save);
 
-    fab.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        boolean isFavorite = databaseHelper.isFavorite(movieId);
-        if (isFavorite) {
-          databaseHelper.deleteFavorite(movieId);
-          fab.setImageResource(R.drawable.ic_save);
-        } else {
-          databaseHelper.addFavorite(Movie.from(movieId, posterPath, title));
-          fab.setImageResource(R.drawable.ic_done);
-        }
+    fab.setOnClickListener(v -> {
+      boolean isFavorite1 = databaseHelper.isFavorite(movieId);
+      if (isFavorite1) {
+        databaseHelper.deleteFavorite(movieId);
+        fab.setImageResource(R.drawable.ic_save);
+      } else {
+        databaseHelper.addFavorite(Movie.from(movieId, posterPath, title));
+        fab.setImageResource(R.drawable.ic_done);
       }
     });
 
