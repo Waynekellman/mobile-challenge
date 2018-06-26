@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import nyc.c4q.vice.mobile.BuildConfig;
 import nyc.c4q.vice.mobile.R;
 import nyc.c4q.vice.mobile.api.MovieService;
 import nyc.c4q.vice.mobile.model.MovieResponse;
@@ -17,8 +18,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import static nyc.c4q.vice.mobile.api.MovieService.API_KEY;
 
 public class HomeView extends LinearLayout {
   private RecyclerView nowPlayingRecyclerView;
@@ -58,7 +57,8 @@ public class HomeView extends LinearLayout {
         .build();
     movieService = retrofit.create(MovieService.class);
 
-    Call<MovieResponse> nowPlayingMovies = movieService.getNowPlayingMovies(API_KEY);
+    Call<MovieResponse> nowPlayingMovies =
+        movieService.getNowPlayingMovies(BuildConfig.MOVIE_DATABASE_API_KEY);
     nowPlayingMovies.enqueue(new Callback<MovieResponse>() {
       @Override
       public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
@@ -74,7 +74,8 @@ public class HomeView extends LinearLayout {
       }
     });
 
-    Call<MovieResponse> popularMovies = movieService.getPopularMovies(API_KEY);
+    Call<MovieResponse> popularMovies =
+        movieService.getPopularMovies(BuildConfig.MOVIE_DATABASE_API_KEY);
     popularMovies.enqueue(new Callback<MovieResponse>() {
       @Override public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
         if (response.isSuccessful()) {
