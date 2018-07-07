@@ -7,6 +7,7 @@ import nyc.c4q.vice.mobile.db.DatabaseModule;
 import nyc.c4q.vice.mobile.ui.DetailsActivity;
 import nyc.c4q.vice.mobile.ui.FavoritesView;
 import nyc.c4q.vice.mobile.ui.HomeView;
+import nyc.c4q.vice.mobile.ui.MainView;
 import nyc.c4q.vice.mobile.ui.MovieViewHolder;
 import nyc.c4q.vice.mobile.ui.PicassoModule;
 
@@ -18,6 +19,8 @@ import nyc.c4q.vice.mobile.ui.PicassoModule;
     PicassoModule.class
 })
 public interface ViceAppComponent {
+  void inject(MainView view);
+
   void inject(HomeView view);
 
   void inject(FavoritesView view);
