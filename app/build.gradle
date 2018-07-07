@@ -44,4 +44,6 @@ dependencies {
 
   implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
   implementation 'com.jakewharton.rxbinding2:rxbinding-design:2.1.1'
+
+  testImplementation 'junit:junit:4.12'
 }
